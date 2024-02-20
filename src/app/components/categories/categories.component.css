@@ -1,0 +1,4 @@
+.add-button {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: center; /* Center items horizontally */
+  }
