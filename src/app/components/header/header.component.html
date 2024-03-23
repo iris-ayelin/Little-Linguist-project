@@ -1,17 +1,11 @@
 <mat-toolbar color="primary">
-    <button mat-icon-button class="example-icon" [matMenuTriggerFor]="menu">
-      <mat-icon>menu</mat-icon>
-    </button>
-  
-    <span>Littel Linguist</span>
-    <span class="example-spacer"></span>
-    <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-      <mat-icon>person</mat-icon>
-    </button>
-  </mat-toolbar>
-  
-  <mat-menu #menu="matMenu">
-    <button mat-menu-item>Management Mode</button>
-    <button mat-menu-item>Game Mode</button>
+  <h1 class="header-title"> {{ title }} </h1>
+  <span class="spacer"></span>
+  <mat-icon>account_circle</mat-icon>
+  <mat-menu #appMenu="matMenu">
+      <button mat-menu-item (click)="navigate('management-mode')">Management Mode</button>
   </mat-menu>
-  
+  <button class="menu" [mat-menu-trigger-for]="appMenu">
+      <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>

@@ -1,42 +1,84 @@
-import { Component } from '@angular/core';
-import { MatTableModule } from '@angular/material/table'
-import { MatIconModule } from '@angular/material/icon'
-import { Category } from '../../shared/model/category';
-import { Language } from '../../shared/model/language';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { TranslatedWord } from '../../shared/model/TranslatedWord';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { Router, RouterModule } from '@angular/router';
+//import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+
+
 
 
 @Component({
-  selector: 'app-categories',
+  selector: 'app-category',
   standalone: true,
-  imports: [MatTableModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, MatTableModule, MatIconModule, RouterModule, MatButtonModule, MatDialogModule],
   templateUrl: './categories.component.html',
-  styleUrl: './categories.component.css'
+  styleUrls: ['./categories.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoriesComponent {
-  displayedColumns: string[] = ['categoryName', 'wordsCount', 'lastUpdated', 'actions'];
-  category1 = new Category(1, "Fruits", Language.English, Language.Hebrew)
-  category2 = new Category(2, "Animals", Language.English, Language.Hebrew)
-  category3 = new Category(3, "Countries", Language.English, Language.Hebrew)
 
-  categoryArray = [this.category1,this.category2,this.category3]
+export class Categories implements OnInit {
+  constructor(private dialog: MatDialog, private router: Router, private cdf: ChangeDetectorRef) { }
+  detailsArray: any = [];
+  displayedColumns: string[] = ['Category Name', 'No. of words', 'Updated Date', 'Actions'];
 
-  constructor() {
-    this.category1.words.push(new TranslatedWord("Apple", "תפוח"));
-    this.category1.words.push(new TranslatedWord("Banana", "בננה"));
-    this.category1.words.push(new TranslatedWord("Watermelon", "אבטיח"))
+  ngOnInit() {
+    const detailsString = localStorage.getItem('category-details');
+    if (detailsString) {
+        const details: any[] = JSON.parse(detailsString);
+        if (Array.isArray(details) && details?.length > 0) {
+          this.detailsArray = details;
+          this.detailsArray.forEach((category: any) => {
+            category['id'] = category.id;
+            category['Category Name'] = category.category;
+            category['No. of words'] = category.words.length;
+            category['Updated Date'] = new Date(category.updateDate).toLocaleDateString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'Asia/Jerusalem'});
+          });
 
-    this.category2.words.push(new TranslatedWord("Dog", "כלב"));
-    this.category2.words.push(new TranslatedWord("Cat", "חתול"));
-    this.category2.words.push(new TranslatedWord("Bird", "ציפור"))
+          this.detailsArray.sort((a: { [x: string]: string; }, b: { [x: string]: string; }) => {
+            const nameA = a['Category Name'].toUpperCase();
+            const nameB = b['Category Name'].toUpperCase(); 
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          });
+        }
+      }
+    }
 
-    this.category3.words.push(new TranslatedWord("Israel", "ישראל"));
-    this.category3.words.push(new TranslatedWord("Greece", "יוון"));
-    this.category3.words.push(new TranslatedWord("Thailand", "תאילנד"))
+  deleteCategory(category: any): void {
+    const selectedCategory = this.detailsArray.find((cat: any) => cat['id'] === category['id']);
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '500px',
+      data: selectedCategory
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log(result)
+        const index = this.detailsArray.findIndex((cat: any) => cat['id'] === selectedCategory.id);
+        if (index !== -1) {
+          this.detailsArray.splice(index, 1);
+          this.detailsArray = [...this.detailsArray];
+          this.cdf.markForCheck();
+          localStorage.setItem('category-details', JSON.stringify(this.detailsArray));
+        }
+      }
+    });
   }
 
-  getCurrentDate(): string {
-    return new Date().toLocaleDateString();
+  editCategory(category: any): void {
+    this.router.navigate(['/add-category'], { queryParams: { id: category.id } });
   }
+
+  navigate(): void {
+    this.router.navigate([`/add-category`]);
+  }
+
 }

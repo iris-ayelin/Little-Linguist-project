@@ -1,0 +1,49 @@
+<h3>Category Details:</h3>
+<div class="form">
+  <mat-form-field>
+    <mat-label>Category Name</mat-label>
+    <input [(ngModel)]="model.Name" matInput required>
+    <mat-error *ngIf="!model.Name">Category Name is required</mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Origin Language</mat-label>
+    <input disabled [(ngModel)]="model.Origin" matInput required>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Target Language</mat-label>
+    <input disabled [(ngModel)]="model.Target" matInput required>
+  </mat-form-field>
+  <div class="words">
+    <h2>Words</h2>
+    <button (click)="addWords()" mat-fab color="primary" [disabled]="!model.Name || !model.Origin || !model.Target">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>
+
+
+<div *ngIf="tableData?.length">
+  <table mat-table [dataSource]="tableData">
+    <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+      <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+      <td mat-cell *matCellDef="let element" class="cell-container">
+        <ng-container *ngIf="column !== 'Actions'">
+          <input matInput [(ngModel)]="element[column]" (blur)="saveData(element)">
+        </ng-container>
+        <ng-container *ngIf="column === 'Actions'">
+          <button mat-icon-button color="warn" (click)="deleteSelectedElement(element)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+
+
+<button [disabled]="!tableData.length" (click)="save()"
+  mat-raised-button color="primary">Save
+  Category</button>

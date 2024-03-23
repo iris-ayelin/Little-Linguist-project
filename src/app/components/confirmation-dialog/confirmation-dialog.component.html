@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>Delete Category</h2>
+<mat-dialog-content>
+  Are you sure do you want to delete Category {{data.category}} ?
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-stroked-button color="warn" (click)="onClick(true)">Yes,Delete</button>
+  <button mat-stroked-button color="primary" (click)="onClick(false)">Cancel</button>
+</mat-dialog-actions>
