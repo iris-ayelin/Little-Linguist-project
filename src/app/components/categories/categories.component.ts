@@ -7,9 +7,6 @@ import { Router, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
-
-
-
 @Component({
   selector: 'app-category',
   standalone: true,
